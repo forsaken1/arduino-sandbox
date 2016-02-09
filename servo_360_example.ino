@@ -2,7 +2,7 @@
 
 #define SERVO_PIN  9
 #define CW   0
-#define STOP 93 # for ds04 nfc servo
+#define STOP 93 // for ds04 nfc servo
 #define CCW  180
 
 Servo myServo;
