@@ -6,7 +6,7 @@
 #define IR_PIN       11
 #define SERVO_PIN    9
 #define CW           0
-#define STOP         91
+#define STOP         90
 #define CCW          180
 #define KEY_UP       0xFFFF8877
 #define KEY_DOWN     0xFFFF9867
