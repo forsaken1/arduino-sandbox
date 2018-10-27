@@ -1,21 +1,25 @@
-int IN3 = 5; // Input3 подключен к выводу 5 left motor 
-int IN4 = 4; 
-int ENB = 3; 
+int IN3 = 6; // Input3 подключен к выводу 5 left motor 
+int IN4 = 7; 
+int ENB = 5; 
 
-int IN1 = 11; // right motor 
-int IN2 = 10;
-int ENA = 9;
+int IN1 = 2; // right motor 
+int IN2 = 4;
+int ENA = 3;
 
-int OUT = 2;
-int S2 = 7;
-int S3 = 6;
+int OUT = 9; // color detector
+int S2 = 8;
+int S3 = 10;
 
 byte red = 0;
 byte green = 0;
 byte blue = 0;
 
-void setup() 
-{ 
+int echo = 12; // distance detector
+int trig = 11; 
+
+float distance;
+
+void init_engines() {
   pinMode (ENB, OUTPUT); 
   pinMode (IN3, OUTPUT); 
   pinMode (IN4, OUTPUT); 
@@ -23,10 +27,25 @@ void setup()
   pinMode (ENA, OUTPUT); 
   pinMode (IN1, OUTPUT); 
   pinMode (IN2, OUTPUT);
+}
 
+void init_color_detector() {
   pinMode(S2, OUTPUT);
   pinMode(S3, OUTPUT);
   pinMode(OUT, INPUT);
+}
+
+void init_distance_detector() {
+  pinMode(trig, OUTPUT); 
+  pinMode(echo, INPUT);
+  digitalWrite(trig, LOW); 
+}
+
+void setup() 
+{ 
+  init_engines();
+  init_distance_detector();
+  //init_color_detector();
   Serial.begin(9600);
 }
 
@@ -43,27 +62,37 @@ void color() // процедура color
 
   // если 2 включить, а 3 отключить, то получим зеленый цвет
   digitalWrite(S2, HIGH);
+  digitalWrite(S3, HIGH);
   green = pulseIn(OUT, digitalRead(OUT) == HIGH ? LOW : HIGH); 
+  digitalWrite(S3, HIGH);
+}
+
+float get_distance() {
+  int duration, cm;
+  digitalWrite(trig, HIGH); 
+  delayMicroseconds(10); 
+  digitalWrite(trig, LOW); 
+  return pulseIn(echo, HIGH)*0.034/2; 
 }
 
 void left_engine_run(int power, boolean front_direction) {
   if(front_direction) {
-    digitalWrite (IN3, LOW); 
-    digitalWrite (IN4, HIGH);
+    digitalWrite (IN3, HIGH); 
+    digitalWrite (IN4, LOW);
   } else {
-    digitalWrite (IN4, LOW); 
-    digitalWrite (IN3, HIGH);
+    digitalWrite (IN4, HIGH); 
+    digitalWrite (IN3, LOW);
   }
   analogWrite(ENB, power);
 }
 
 void right_engine_run(int power, boolean front_direction) {
   if(front_direction) {
-    digitalWrite (IN1, LOW);
-    digitalWrite (IN2, HIGH);
-  } else {
-    digitalWrite (IN2, LOW);
     digitalWrite (IN1, HIGH);
+    digitalWrite (IN2, LOW);
+  } else {
+    digitalWrite (IN2, HIGH);
+    digitalWrite (IN1, LOW);
   }
   analogWrite(ENA, power);
 }
@@ -92,13 +121,13 @@ void back(int power) {
 }
 
 void left(int power) {
-  left_engine_run(power, false);
-  right_engine_run(power, true);
+  left_engine_run(power, true);
+  right_engine_run(power, false);
 }
 
 void right(int power) {
-  left_engine_run(power, true);
-  right_engine_run(power, false);
+  left_engine_run(power, false);
+  right_engine_run(power, true);
 }
 
 void loop() 
@@ -108,9 +137,12 @@ void loop()
 //  left(50);
 //  delay(1000);
 //  stop();
-  color();
-  Serial.print(" RED :" + String(red));
-  Serial.print(" GREEN : " + String(green));
-  Serial.println(" BLUE : " + String(blue));
-  delay(500);
+  //color();
+//  Serial.print(" RED :" + String(red));
+//  Serial.print(" GREEN : " + String(green));
+//  Serial.println(" BLUE : " + String(blue));
+  distance = get_distance();
+  Serial.println(distance);
+  delay(100);
+//  delay(500);
 }
