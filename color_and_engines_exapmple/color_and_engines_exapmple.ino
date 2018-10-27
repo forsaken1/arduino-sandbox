@@ -136,19 +136,55 @@ void right(int power) {
     right_engine_run(power, true);
 }
 
+void step(int power) {
+    move(power);
+    delay(10);
+    stop();
+    delay(10);
+}
+
+void step_right(int power) {
+    right(power);
+    delay(10);
+    stop();
+    delay(10);
+}
+
+void step_left(int power) {
+    left(power);
+    delay(10);
+    stop();
+    delay(10);
+}
+
+bool lost_blue() {
+    Serial.println(String(blue));
+    return blue > 50;
+}
+
+void find_path(int power) {
+    for(int i = 0; i < 3; i++) {
+      step_right(power);
+      if(!lost_blue()) { return; }
+    }
+    
+    for(int i = 0; i < 6; i++) {
+      step_left(power);
+      if(!lost_blue()) { return; }
+    }
+    
+    for(int i = 0; i < 3; i++) {
+      step_right(power);
+      if(!lost_blue()) { return; }
+    }
+}
+
 void loop() 
 { 
-//  right(50);
-//  delay(1000);
-//  left(50);
-//  delay(1000);
-//  stop();
     color();
-    Serial.print(" RED :" + String(red));
-    Serial.print(" GREEN : " + String(green));
-    Serial.println(" BLUE : " + String(blue));
-//  distance = get_distance();
-//  Serial.println(distance);
-//  delay(100);
-    delay(500);
+    if(lost_blue()) {
+        find_path(100);
+    } else {
+        step(80);
+    }
 }
