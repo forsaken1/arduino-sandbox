@@ -22,118 +22,118 @@ int trig = 11;
 float distance;
 
 void init_engines() {
-  pinMode (ENB, OUTPUT); 
-  pinMode (IN3, OUTPUT); 
-  pinMode (IN4, OUTPUT); 
-  
-  pinMode (ENA, OUTPUT); 
-  pinMode (IN1, OUTPUT); 
-  pinMode (IN2, OUTPUT);
+    pinMode (ENB, OUTPUT); 
+    pinMode (IN3, OUTPUT); 
+    pinMode (IN4, OUTPUT); 
+    
+    pinMode (ENA, OUTPUT); 
+    pinMode (IN1, OUTPUT); 
+    pinMode (IN2, OUTPUT);
 }
 
 void init_color_detector() {
-  pinMode(S0, OUTPUT);
-  pinMode(S1, OUTPUT);
-  pinMode(S2, OUTPUT);
-  pinMode(S3, OUTPUT);
-  pinMode(OUT, INPUT);
+    pinMode(S0, OUTPUT);
+    pinMode(S1, OUTPUT);
+    pinMode(S2, OUTPUT);
+    pinMode(S3, OUTPUT);
+    pinMode(OUT, INPUT);
 
-  digitalWrite(S0, LOW);
-  digitalWrite(S1, HIGH);
+    digitalWrite(S0, LOW);
+    digitalWrite(S1, HIGH);
 }
 
 void init_distance_detector() {
-  pinMode(trig, OUTPUT); 
-  pinMode(echo, INPUT);
-  digitalWrite(trig, LOW); 
+    pinMode(trig, OUTPUT); 
+    pinMode(echo, INPUT);
+    digitalWrite(trig, LOW); 
 }
 
 void setup() 
 { 
-  init_engines();
-  init_distance_detector();
-  init_color_detector();
-  Serial.begin(9600);
+    init_engines();
+    init_distance_detector();
+    init_color_detector();
+    Serial.begin(9600);
 }
 
 void color() // процедура color
 {
-  // если 2 и 3 порты отключить, то получим значение красного цвета
-  digitalWrite(S2, LOW);
-  digitalWrite(S3, LOW);
-  red = pulseIn(OUT, LOW);
+    // если 2 и 3 порты отключить, то получим значение красного цвета
+    digitalWrite(S2, LOW);
+    digitalWrite(S3, LOW);
+    red = pulseIn(OUT, LOW);
 
-  // если 3 порт включить, а 2 отключить, то получим синий цвет
-  digitalWrite(S3, HIGH);
-  blue = pulseIn(OUT, LOW);
+    // если 3 порт включить, а 2 отключить, то получим синий цвет
+    digitalWrite(S3, HIGH);
+    blue = pulseIn(OUT, LOW);
 
-  // если 2 включить, а 3 отключить, то получим зеленый цвет
-  digitalWrite(S2, HIGH);
-  digitalWrite(S3, HIGH);
-  green = pulseIn(OUT, LOW);
+    // если 2 включить, а 3 отключить, то получим зеленый цвет
+    digitalWrite(S2, HIGH);
+    digitalWrite(S3, HIGH);
+    green = pulseIn(OUT, LOW);
 }
 
 float get_distance() {
-  int duration, cm;
-  digitalWrite(trig, HIGH); 
-  delayMicroseconds(10); 
-  digitalWrite(trig, LOW); 
-  return pulseIn(echo, HIGH)*0.034/2; 
+    int duration, cm;
+    digitalWrite(trig, HIGH); 
+    delayMicroseconds(10); 
+    digitalWrite(trig, LOW); 
+    return pulseIn(echo, HIGH)*0.034/2; 
 }
 
 void left_engine_run(int power, boolean front_direction) {
-  if(front_direction) {
-    digitalWrite (IN3, HIGH); 
-    digitalWrite (IN4, LOW);
-  } else {
-    digitalWrite (IN4, HIGH); 
-    digitalWrite (IN3, LOW);
-  }
-  analogWrite(ENB, power);
+    if(front_direction) {
+        digitalWrite (IN3, HIGH); 
+        digitalWrite (IN4, LOW);
+    } else {
+        digitalWrite (IN4, HIGH); 
+        digitalWrite (IN3, LOW);
+    }
+    analogWrite(ENB, power);
 }
 
 void right_engine_run(int power, boolean front_direction) {
-  if(front_direction) {
-    digitalWrite (IN1, HIGH);
-    digitalWrite (IN2, LOW);
-  } else {
-    digitalWrite (IN2, HIGH);
-    digitalWrite (IN1, LOW);
-  }
-  analogWrite(ENA, power);
+    if(front_direction) {
+        digitalWrite (IN1, HIGH);
+        digitalWrite (IN2, LOW);
+    } else {
+        digitalWrite (IN2, HIGH);
+        digitalWrite (IN1, LOW);
+    }
+    analogWrite(ENA, power);
 }
 
 void left_engine_stop() {
-  digitalWrite(ENB, 0);
+    digitalWrite(ENB, 0);
 }
 
 void right_engine_stop() {
-  digitalWrite(ENA, 0);
+    digitalWrite(ENA, 0);
 }
 
 void stop() {
-  left_engine_stop();
-  right_engine_stop();
+    left_engine_stop();
+    right_engine_stop();
 }
 
 void move(int power) {
-  left_engine_run(power, true);
-  right_engine_run(power, true);
+    left_engine_run(power, true);
+    right_engine_run(power, true);
 }
 
 void back(int power) {
-  left_engine_run(power, false);
-  right_engine_run(power, false);
+    left_engine_run(power, false);
+    right_engine_run(power, false);
 }
 
 void left(int power) {
-  left_engine_run(power, true);
-  right_engine_run(power, false);
+    left_engine_run(power, true);
+    right_engine_run(power, false);
 }
 
 void right(int power) {
-  left_engine_run(power, false);
-  right_engine_run(power, true);
+    left_engine_run(power, false);
+    right_engine_run(power, true);
 }
 
 void loop() 
@@ -143,12 +143,12 @@ void loop()
 //  left(50);
 //  delay(1000);
 //  stop();
-  color();
-  Serial.print(" RED :" + String(red));
-  Serial.print(" GREEN : " + String(green));
-  Serial.println(" BLUE : " + String(blue));
+    color();
+    Serial.print(" RED :" + String(red));
+    Serial.print(" GREEN : " + String(green));
+    Serial.println(" BLUE : " + String(blue));
 //  distance = get_distance();
 //  Serial.println(distance);
 //  delay(100);
-  delay(500);
+    delay(500);
 }
