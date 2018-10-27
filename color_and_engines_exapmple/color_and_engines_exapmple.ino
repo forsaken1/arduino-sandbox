@@ -7,6 +7,8 @@ int IN2 = 4;
 int ENA = 3;
 
 int OUT = 9; // color detector
+int S0 = 11;
+int S1 = 12;
 int S2 = 8;
 int S3 = 10;
 
@@ -30,9 +32,14 @@ void init_engines() {
 }
 
 void init_color_detector() {
+  pinMode(S0, OUTPUT);
+  pinMode(S1, OUTPUT);
   pinMode(S2, OUTPUT);
   pinMode(S3, OUTPUT);
   pinMode(OUT, INPUT);
+
+  digitalWrite(S0, LOW);
+  digitalWrite(S1, HIGH);
 }
 
 void init_distance_detector() {
@@ -45,7 +52,7 @@ void setup()
 { 
   init_engines();
   init_distance_detector();
-  //init_color_detector();
+  init_color_detector();
   Serial.begin(9600);
 }
 
@@ -54,17 +61,16 @@ void color() // процедура color
   // если 2 и 3 порты отключить, то получим значение красного цвета
   digitalWrite(S2, LOW);
   digitalWrite(S3, LOW);
-  red = pulseIn(OUT, digitalRead(OUT) == HIGH ? LOW : HIGH);
+  red = pulseIn(OUT, LOW);
 
   // если 3 порт включить, а 2 отключить, то получим синий цвет
   digitalWrite(S3, HIGH);
-  blue = pulseIn(OUT, digitalRead(OUT) == HIGH ? LOW : HIGH);
+  blue = pulseIn(OUT, LOW);
 
   // если 2 включить, а 3 отключить, то получим зеленый цвет
   digitalWrite(S2, HIGH);
   digitalWrite(S3, HIGH);
-  green = pulseIn(OUT, digitalRead(OUT) == HIGH ? LOW : HIGH); 
-  digitalWrite(S3, HIGH);
+  green = pulseIn(OUT, LOW);
 }
 
 float get_distance() {
@@ -137,12 +143,12 @@ void loop()
 //  left(50);
 //  delay(1000);
 //  stop();
-  //color();
-//  Serial.print(" RED :" + String(red));
-//  Serial.print(" GREEN : " + String(green));
-//  Serial.println(" BLUE : " + String(blue));
-  distance = get_distance();
-  Serial.println(distance);
-  delay(100);
-//  delay(500);
+  color();
+  Serial.print(" RED :" + String(red));
+  Serial.print(" GREEN : " + String(green));
+  Serial.println(" BLUE : " + String(blue));
+//  distance = get_distance();
+//  Serial.println(distance);
+//  delay(100);
+  delay(500);
 }
