@@ -3,8 +3,16 @@ int IN4 = 4;
 int ENB = 3; 
 
 int IN1 = 11; // right motor 
-int IN2 = 10; 
-int ENA = 9; 
+int IN2 = 10;
+int ENA = 9;
+
+int OUT = 2;
+int S2 = 7;
+int S3 = 6;
+
+byte red = 0;
+byte green = 0;
+byte blue = 0;
 
 void setup() 
 { 
@@ -14,7 +22,28 @@ void setup()
   
   pinMode (ENA, OUTPUT); 
   pinMode (IN1, OUTPUT); 
-  pinMode (IN2, OUTPUT); 
+  pinMode (IN2, OUTPUT);
+
+  pinMode(S2, OUTPUT);
+  pinMode(S3, OUTPUT);
+  pinMode(OUT, INPUT);
+  Serial.begin(9600);
+}
+
+void color() // процедура color
+{
+  // если 2 и 3 порты отключить, то получим значение красного цвета
+  digitalWrite(S2, LOW);
+  digitalWrite(S3, LOW);
+  red = pulseIn(OUT, digitalRead(OUT) == HIGH ? LOW : HIGH);
+
+  // если 3 порт включить, а 2 отключить, то получим синий цвет
+  digitalWrite(S3, HIGH);
+  blue = pulseIn(OUT, digitalRead(OUT) == HIGH ? LOW : HIGH);
+
+  // если 2 включить, а 3 отключить, то получим зеленый цвет
+  digitalWrite(S2, HIGH);
+  green = pulseIn(OUT, digitalRead(OUT) == HIGH ? LOW : HIGH); 
 }
 
 void left_engine_run(int power, boolean front_direction) {
@@ -74,9 +103,14 @@ void right(int power) {
 
 void loop() 
 { 
-  right(50);
-  delay(1000);
-  left(50);
-  delay(1000);
-  stop();
+//  right(50);
+//  delay(1000);
+//  left(50);
+//  delay(1000);
+//  stop();
+  color();
+  Serial.print(" RED :" + String(red));
+  Serial.print(" GREEN : " + String(green));
+  Serial.println(" BLUE : " + String(blue));
+  delay(500);
 }
