@@ -5,8 +5,8 @@
 #define CW               0
 #define STOP             90
 #define CCW              180
-
-#define LED              4
+#define ON_OFF_BUTTON    4
+#define LED              5
 
 int OUT = 9; // color detector
 int S0 = 11;
@@ -22,6 +22,8 @@ int echo = 12; // distance detector
 int trig = 11; 
 
 float distance;
+
+bool on = true;
 
 Servo leftEngine, rightEngine;
 
@@ -54,6 +56,7 @@ void setup()
     init_engines();
     init_distance_detector();
     init_color_detector();
+    pinMode(ON_OFF_BUTTON, INPUT);
     Serial.begin(9600);
 }
 
@@ -80,12 +83,19 @@ void color()
     }
 }
 
+void on_off_button() {
+    if(digitalRead(ON_OFF_BUTTON) == 1) {
+      on = !on;
+      delay(1000);
+    }
+}
+
 float get_distance() {
     int duration, cm;
-    digitalWrite(trig, HIGH); 
-    delayMicroseconds(10); 
-    digitalWrite(trig, LOW); 
-    return pulseIn(echo, HIGH)*0.034/2; 
+    digitalWrite(trig, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trig, LOW);
+    return pulseIn(echo, HIGH)*0.034/2;
 }
 
 void stop() {
@@ -93,75 +103,76 @@ void stop() {
     rightEngine.write(STOP);
 }
 
-void move(int power) {
+void move() {
     leftEngine.write(CW);
     rightEngine.write(CCW);
 }
 
-void back(int power) {
+void back() {
     leftEngine.write(CCW);
     rightEngine.write(CW);
 }
 
-void left(int power) {
+void left() {
     leftEngine.write(CCW);
     rightEngine.write(CCW);
 }
 
-void right(int power) {
+void right() {
     leftEngine.write(CW);
     rightEngine.write(CW);
 }
 
-void step(int power) {
-    move(power);
+void step() {
+    move();
     delay(10);
     stop();
     delay(10);
 }
 
-void step_right(int power) {
-    right(power);
+void step_right() {
+    right();
     delay(1);
     stop();
     delay(1);
 }
 
-void step_left(int power) {
-    left(power);
+void step_left() {
+    left();
     delay(1);
     stop();
     delay(1);
 }
 
 bool lost_blue() {
-    Serial.println(String(blue));
     return blue > 50;
 }
 
 void find_path(int power) {
     for(int i = 0; i < 3; i++) {
-      step_right(power);
+      step_right();
       if(!lost_blue()) { return; }
     }
     
     for(int i = 0; i < 6; i++) {
-      step_left(power);
+      step_left();
       if(!lost_blue()) { return; }
     }
     
     for(int i = 0; i < 3; i++) {
-      step_right(power);
+      step_right();
       if(!lost_blue()) { return; }
     }
 }
 
 void loop() 
-{ 
+{
+    on_off_button();
+    if(!on) return;
     color();
     if(lost_blue()) {
         find_path(100);
     } else {
-        step(80);
+        step();
     }
 }
