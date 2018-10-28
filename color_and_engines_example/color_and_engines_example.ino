@@ -6,6 +6,8 @@
 #define STOP             90
 #define CCW              180
 
+#define LED              4
+
 int OUT = 9; // color detector
 int S0 = 11;
 int S1 = 12;
@@ -35,6 +37,7 @@ void init_color_detector() {
     pinMode(S2, OUTPUT);
     pinMode(S3, OUTPUT);
     pinMode(OUT, INPUT);
+    pinMode(LED, OUTPUT);
 
     digitalWrite(S0, LOW);
     digitalWrite(S1, HIGH);
@@ -54,7 +57,7 @@ void setup()
     Serial.begin(9600);
 }
 
-void color() // процедура color
+void color()
 {
     // если 2 и 3 порты отключить, то получим значение красного цвета
     digitalWrite(S2, LOW);
@@ -69,6 +72,12 @@ void color() // процедура color
     digitalWrite(S2, HIGH);
     digitalWrite(S3, HIGH);
     green = pulseIn(OUT, LOW);
+
+    if(lost_blue()) {
+      digitalWrite(LED, LOW);
+    } else {
+      digitalWrite(LED, HIGH);
+    }
 }
 
 float get_distance() {
@@ -113,16 +122,16 @@ void step(int power) {
 
 void step_right(int power) {
     right(power);
-    delay(10);
+    delay(1);
     stop();
-    delay(10);
+    delay(1);
 }
 
 void step_left(int power) {
     left(power);
-    delay(10);
+    delay(1);
     stop();
-    delay(10);
+    delay(1);
 }
 
 bool lost_blue() {
@@ -149,10 +158,10 @@ void find_path(int power) {
 
 void loop() 
 { 
-//    color();
-//    if(lost_blue()) {
-//        find_path(100);
-//    } else {
-//        step(80);
-//    }
+    color();
+    if(lost_blue()) {
+        find_path(100);
+    } else {
+        step(80);
+    }
 }
