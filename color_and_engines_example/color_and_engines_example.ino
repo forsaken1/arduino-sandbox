@@ -1,30 +1,28 @@
 #include "Servo.h"
 
-#define LEFT_SERVO_PIN   7
+#define ON_OFF_BUTTON    4
+#define LED              5
 #define RIGHT_SERVO_PIN  6
+#define LEFT_SERVO_PIN   7
+#define S2               8
+#define COLOR            9
+#define S3               10
+#define S0               11
+#define S1               12
+
 #define CW               0
 #define STOP             90
 #define CCW              180
-#define ON_OFF_BUTTON    4
-#define LED              5
 
-int OUT = 9; // color detector
-int S0 = 11;
-int S1 = 12;
-int S2 = 8;
-int S3 = 10;
+#define ECHO             12
+#define TRIG             11
 
 byte red = 0;
 byte green = 0;
 byte blue = 0;
 
-int echo = 12; // distance detector
-int trig = 11; 
-
 float distance;
-
 bool on = true;
-
 Servo leftEngine, rightEngine;
 
 void init_engines() {
@@ -38,7 +36,7 @@ void init_color_detector() {
     pinMode(S1, OUTPUT);
     pinMode(S2, OUTPUT);
     pinMode(S3, OUTPUT);
-    pinMode(OUT, INPUT);
+    pinMode(COLOR, INPUT);
     pinMode(LED, OUTPUT);
 
     digitalWrite(S0, LOW);
@@ -46,9 +44,9 @@ void init_color_detector() {
 }
 
 void init_distance_detector() {
-    pinMode(trig, OUTPUT); 
-    pinMode(echo, INPUT);
-    digitalWrite(trig, LOW); 
+    pinMode(TRIG, OUTPUT); 
+    pinMode(ECHO, INPUT);
+    digitalWrite(TRIG, LOW); 
 }
 
 void setup() 
@@ -65,16 +63,16 @@ void color()
     // если 2 и 3 порты отключить, то получим значение красного цвета
     digitalWrite(S2, LOW);
     digitalWrite(S3, LOW);
-    red = pulseIn(OUT, LOW);
+    red = pulseIn(COLOR, LOW);
 
     // если 3 порт включить, а 2 отключить, то получим синий цвет
     digitalWrite(S3, HIGH);
-    blue = pulseIn(OUT, LOW);
+    blue = pulseIn(COLOR, LOW);
 
     // если 2 включить, а 3 отключить, то получим зеленый цвет
     digitalWrite(S2, HIGH);
     digitalWrite(S3, HIGH);
-    green = pulseIn(OUT, LOW);
+    green = pulseIn(COLOR, LOW);
 
     if(lost_blue()) {
       digitalWrite(LED, LOW);
@@ -92,10 +90,10 @@ void on_off_button() {
 
 float get_distance() {
     int duration, cm;
-    digitalWrite(trig, HIGH);
+    digitalWrite(TRIG, HIGH);
     delayMicroseconds(10);
-    digitalWrite(trig, LOW);
-    return pulseIn(echo, HIGH)*0.034/2;
+    digitalWrite(TRIG, LOW);
+    return pulseIn(ECHO, HIGH)*0.034/2;
 }
 
 void stop() {
@@ -168,8 +166,8 @@ void find_path(int power) {
 void loop() 
 {
     on_off_button();
-    if(!on) return;
     color();
+    if(!on) return;
     if(lost_blue()) {
         find_path(100);
     } else {
