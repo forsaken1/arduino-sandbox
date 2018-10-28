@@ -17,6 +17,8 @@
 #define ECHO             12
 #define TRIG             11
 
+#define DELAY            50
+
 byte red = 0;
 byte green = 0;
 byte blue = 0;
@@ -74,6 +76,10 @@ void color()
     digitalWrite(S3, HIGH);
     green = pulseIn(COLOR, LOW);
 
+    led();
+}
+
+void led() {
     if(lost_blue()) {
       digitalWrite(LED, LOW);
     } else {
@@ -123,30 +129,30 @@ void right() {
 
 void step() {
     move();
-    delay(10);
+    delay(DELAY * 2);
     stop();
-    delay(10);
+    delay(DELAY * 2);
 }
 
 void step_right() {
     right();
-    delay(1);
+    delay(DELAY);
     stop();
-    delay(1);
+    delay(DELAY);
 }
 
 void step_left() {
     left();
-    delay(1);
+    delay(DELAY);
     stop();
-    delay(1);
+    delay(DELAY);
 }
 
 bool lost_blue() {
     return blue > 50;
 }
 
-void find_path(int power) {
+void find_path() {
     for(int i = 0; i < 3; i++) {
       step_right();
       if(!lost_blue()) { return; }
@@ -169,7 +175,7 @@ void loop()
     color();
     if(!on) return;
     if(lost_blue()) {
-        find_path(100);
+        find_path();
     } else {
         step();
     }
