@@ -1,10 +1,10 @@
-int IN3 = 6; // Input3 подключен к выводу 5 left motor 
-int IN4 = 7; 
-int ENB = 5; 
+#include "Servo.h"
 
-int IN1 = 2; // right motor 
-int IN2 = 4;
-int ENA = 3;
+#define LEFT_SERVO_PIN   7
+#define RIGHT_SERVO_PIN  6
+#define CW               0
+#define STOP             90
+#define CCW              180
 
 int OUT = 9; // color detector
 int S0 = 11;
@@ -21,14 +21,12 @@ int trig = 11;
 
 float distance;
 
+Servo leftEngine, rightEngine;
+
 void init_engines() {
-    pinMode (ENB, OUTPUT); 
-    pinMode (IN3, OUTPUT); 
-    pinMode (IN4, OUTPUT); 
-    
-    pinMode (ENA, OUTPUT); 
-    pinMode (IN1, OUTPUT); 
-    pinMode (IN2, OUTPUT);
+    leftEngine.attach(LEFT_SERVO_PIN);
+    rightEngine.attach(RIGHT_SERVO_PIN);
+    stop();
 }
 
 void init_color_detector() {
@@ -81,59 +79,29 @@ float get_distance() {
     return pulseIn(echo, HIGH)*0.034/2; 
 }
 
-void left_engine_run(int power, boolean front_direction) {
-    if(front_direction) {
-        digitalWrite (IN3, HIGH); 
-        digitalWrite (IN4, LOW);
-    } else {
-        digitalWrite (IN4, HIGH); 
-        digitalWrite (IN3, LOW);
-    }
-    analogWrite(ENB, power);
-}
-
-void right_engine_run(int power, boolean front_direction) {
-    if(front_direction) {
-        digitalWrite (IN1, HIGH);
-        digitalWrite (IN2, LOW);
-    } else {
-        digitalWrite (IN2, HIGH);
-        digitalWrite (IN1, LOW);
-    }
-    analogWrite(ENA, power);
-}
-
-void left_engine_stop() {
-    digitalWrite(ENB, 0);
-}
-
-void right_engine_stop() {
-    digitalWrite(ENA, 0);
-}
-
 void stop() {
-    left_engine_stop();
-    right_engine_stop();
+    leftEngine.write(STOP + 5);
+    rightEngine.write(STOP);
 }
 
 void move(int power) {
-    left_engine_run(power, true);
-    right_engine_run(power, true);
+    leftEngine.write(CW);
+    rightEngine.write(CCW);
 }
 
 void back(int power) {
-    left_engine_run(power, false);
-    right_engine_run(power, false);
+    leftEngine.write(CCW);
+    rightEngine.write(CW);
 }
 
 void left(int power) {
-    left_engine_run(power, true);
-    right_engine_run(power, false);
+    leftEngine.write(CCW);
+    rightEngine.write(CCW);
 }
 
 void right(int power) {
-    left_engine_run(power, false);
-    right_engine_run(power, true);
+    leftEngine.write(CW);
+    rightEngine.write(CW);
 }
 
 void step(int power) {
@@ -181,10 +149,10 @@ void find_path(int power) {
 
 void loop() 
 { 
-    color();
-    if(lost_blue()) {
-        find_path(100);
-    } else {
-        step(80);
-    }
+//    color();
+//    if(lost_blue()) {
+//        find_path(100);
+//    } else {
+//        step(80);
+//    }
 }
