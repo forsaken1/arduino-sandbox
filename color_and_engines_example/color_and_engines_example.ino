@@ -54,7 +54,7 @@ void init_distance_detector() {
 void setup() 
 { 
     init_engines();
-    init_distance_detector();
+//    init_distance_detector();
     init_color_detector();
     pinMode(ON_OFF_BUTTON, INPUT);
     Serial.begin(9600);
@@ -73,17 +73,16 @@ void color()
 
     // если 2 включить, а 3 отключить, то получим зеленый цвет
     digitalWrite(S2, HIGH);
-    digitalWrite(S3, HIGH);
     green = pulseIn(COLOR, LOW);
 
     led();
 }
 
 void led() {
-    if(lost_blue()) {
-      digitalWrite(LED, LOW);
-    } else {
+    if(path_is_blue()) {
       digitalWrite(LED, HIGH);
+    } else {
+      digitalWrite(LED, LOW);
     }
 }
 
@@ -148,33 +147,36 @@ void step_left() {
     delay(DELAY);
 }
 
-bool lost_blue() {
-    return blue > 50;
+bool path_is_blue() {
+    return blue < 50 && red > 50 && green > 50;
 }
 
 void find_path() {
     for(int i = 0; i < 3; i++) {
       step_right();
-      if(!lost_blue()) { return; }
+      color();
+      if(path_is_blue()) { return; }
     }
     
     for(int i = 0; i < 6; i++) {
       step_left();
-      if(!lost_blue()) { return; }
+      color();
+      if(path_is_blue()) { return; }
     }
     
     for(int i = 0; i < 3; i++) {
       step_right();
-      if(!lost_blue()) { return; }
+      color();
+      if(path_is_blue()) { return; }
     }
 }
 
 void loop() 
 {
-    on_off_button();
+//    on_off_button();
     color();
-    if(!on) return;
-    if(lost_blue()) {
+//    if(!on) return;
+    if(!path_is_blue()) {
         find_path();
     } else {
         step();
